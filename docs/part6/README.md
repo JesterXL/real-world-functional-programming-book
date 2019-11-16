@@ -1,0 +1,9 @@
+# Algebraic Data Types
+
+Algebraic Data Types are Objects in Functional Programming that give you a common interface to work with data in a pure way. Most pure functions you've seen up to this point take inputs of data and return modified data. ADT's are different; they contain data and hold on it just like `Object`'s or `Array`'s do. Functions typically know how to "take in an Array and give you a new, modified version of the Array back". Like OOP, however, ADT's have functions, or "methods", of their own to work with the data inside them and compose with other ADT's. 
+
+While dynamic programming languages don't have strong typing, they still have native types like `Array` and `Promise` that hold data and have conventions on how you use them. An Array is a list, I can add data to it like `Array.push`, get data out using numbers `myList[0]` or methods `Array.pop`, and construction methods like Array destructuring `[...original, "new data to add"]`. A `Promise` also wraps data in itself, you can get data out using `then`, and like Array's `concat` method, you can chain Promises together by returning a Promise in the `then` callback.
+
+Algebraic Data Types, or ADT's for short, are useful just like Array and Promise are useful: Hold data, you can get data out, and depending on which library you use, all can be chained together in known ways.
+
+This is also where dynamic languages start to become painful. Creating an Array or Promise is fine, but once you start chaining things together, it's hard to know "what comes out" without a compiler or intellisense in your IDE to help you. Algebraic Data Types have this problem as well once you start composing them together. You only really know if it works by running the code or having copious unit tests. Still, they can add clarity of intent, help in data validation, and make it easier to work with data and errors in a pure way.
