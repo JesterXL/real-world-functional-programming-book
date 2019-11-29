@@ -108,7 +108,7 @@ In JavaScript, the simple solution is to return a `Promise`. It'll resolve when 
 
 ## Random Noops
 
-When you see functions that don't return values, you'll start to immediately identify them as noops. As long as they're logging related, you can often let them go. However, other times, they'll be in amongst other functions, not classes, and your hair should stand on end:
+When you see functions that don't return values, you'll start to immediately identify them as noops. As long as they're logging related, you can often let them go. However, other times, they'll be in amongst other functions, not classes, and your hair should stand on end. Below is some Node.js code connecting to a Postegres database:
 
 ```javascript
 const getUsers = pg =>
@@ -152,7 +152,7 @@ Be on the lookout for functions that have no return value and aren't logging rel
 
 Node was created and used long before `Promises` became du-jour in JavaScript. There are still many callback holdouts who swear by their [async library](https://github.com/caolan/async). This means most of the popular API and site frameworks such as [Express](https://expressjs.com/) and [Restify](http://restify.com/) all follow the Node middleware ways of architecting and building plugins. Middlewares hide massive side effects and are not pure.
 
-A basic API to get a list of suers in Express looks like:
+A basic API to get a list of users in Express looks like:
 
 ```javascript
 app.get('/users/list', (req, res) =>

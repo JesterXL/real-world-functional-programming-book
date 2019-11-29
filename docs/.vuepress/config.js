@@ -3,10 +3,10 @@ module.exports = {
     base: '/real-world-functional-programming-book/',
     themeConfig: {
       displayAllHeaders: false,
-      sidebarDepth: 3,
+      sidebarDepth: 2,
       sidebar: [
         {
-          title: 'Inroduction',   // required
+          title: 'Introduction',   // required
           path: '/',      // optional, which should be a absolute path.
           sidebarDepth: 3,    // optional, defaults to 1
           children: []
@@ -17,6 +17,7 @@ module.exports = {
           sidebarDepth: 3,    // optional, defaults to 1
           children: [
             '/part1/input_output_side_effects',
+            '/part1/what_is_a_side_effect',
             '/part1/var_and_let',
             '/part1/using_vs_enforcing_immutability',
             '/part1/spot_the_impurities',
@@ -51,29 +52,32 @@ module.exports = {
           ]
         },
         {
-          title: 'Part 4: Curry and Partial Applications',
+          title: 'Part 4: Basic Function Composition',
           path: '/part4/',
           sidebarDepth: 3,
           children: [
-            '/part4/curry',
-            '/part4/parameter_order',
-            '/part4/partial_application',
-            '/part4/closures_and_immutability',
-            '/part4/arity',
-            '/part4/styles_of_curry',
-            '/part4/lodash_fp'
+            '/part4/nesting',
+            '/part4/composition',
+            '/part4/promise',
+            '/part4/pipeline',
+            '/part4/summary_of_composing'
           ]
         },
         {
-          title: 'Part 5: Composition',
+          title: 'Part 5: Curry and Partial Applications',
           path: '/part5/',
           sidebarDepth: 3,
           children: [
-            '/part5/passing_functions_to_functions',
-            '/part5/composing_functions',
-            '/part5/tacit_programming'
+            '/part5/curry',
+            '/part5/parameter_order',
+            '/part5/partial_application',
+            '/part5/closures_and_immutability',
+            '/part5/arity',
+            '/part5/styles_of_curry',
+            '/part5/lodash_fp'
           ]
         },
+        
         {
           title: 'Part 6: Algebraic Data Types',
           path: '/part6/',

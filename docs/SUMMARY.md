@@ -27,6 +27,11 @@
     * [zip](part3/zip.md)
     * [Practice every with Predicates](part3/practice_every.md)
     * [Practice map with JSON](part3/practice_map.md)
+* [Part 4: Basic Function Composition]
+    * Nesting
+    * Compose
+    * Promise
+    * Pipeline
 * [Part 4: Curry and Partial Application](part4/README.md)
     * [All Functions Take 1 Argument](part4/curry.md)
     * [Parameter Order](part4/parameter_order.md)

@@ -31,7 +31,7 @@ query = {[key]: value}
 log(query) // { name: 'jesse' }
 ```
 
-It's really easy and quick to create temporary `let` and `const` variables in a procedural way to play with ideas. You can log each line to see exactly what is happening to learn or find mistakes.
+It's convenient to create temporary `let` and `const` variables in a procedural way to play with ideas. You can log each line to see exactly what is happening to learn or find mistakes. This is the raw leggos and clay of dynamic languages and should be encouraged.
 
 ## Pure lets
 
@@ -58,9 +58,9 @@ const parseQuery = url => {
 log(parseQuery(url)) // { name: 'jesse' }
 ```
 
-Copy pasta coding! Notice that we just copy and pasted the code inside a function. It follows the same input, same output rule. The outside world part we need, the `url`, is passed into the arguments. The `query`, although it's a `let` variable, it only exists for the life of the function and doesn't affect the outside world. Same for the `key` and `value` are constants, but they too only exist inside the function. 
+Copy pasta coding 🍝! Notice that we just copy and pasted the code inside a function. It follows the same input, same output rule. The outside world part we need, the `url`, is passed into the arguments. The `query`, although it's a `let` variable, it only exists for the life of the function and doesn't affect the outside world. Same for the `key` and `value` are constants, but they too only exist inside the function. 
 
-The `log` technically breaks the being affected by the outside world, and affecting the world after its run. He's a noop, though, a function that returns no value so we assume it "does no operation". You'll start to develop a 6th sense when you see noops, they probably indicate side effects happen after you call the function. We also use the `log` as a closure variable. He's harmless though, so this is ok. For now. See [Part 9: Logging & Purity](../part9/log_purity.md) to see a counterpoint to this.
+The `log` technically breaks the being affected by the outside world, and affecting the world after its run. He's a noop, though, a function that returns no value so we assume it "does no operation". You'll start to develop a 6th sense when you see noops, they probably indicate side effects happen after you call the function. We also use the `log` as a closure variable. For showing how function purity works, the `log` is harmless for now. Editor: FIXME. See [Part 9: Logging & Purity](../part9/log_purity.md) to see a counterpoint to this.
 
 ## const Ain't So Constant
 
@@ -88,7 +88,7 @@ console.log(friends) // [ '🐄', '🐕', '🦆' ]
 
 **Solution**: Use immutable return values, assign those to `const`.
 
-Complex objects like `Object` and `Array`, or even modules and class instances will have methods that can hide mutation; changing a variable's value. This is how you're supposed to do things in Object Oriented Programming, hiding data access and modification. Practice immutability by creating new objects, deep clones, or using [Destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) shown in [Same Input, Same Output, No Side Effects](part1/input_output_side_effects.md) inside of pure functions.
+Complex objects like `Object` and `Array`, or even modules and class instances will have methods that can hide mutation; changing a variable's value. Practice immutability by creating new objects, deep clones, or using [Destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) shown in [Same Input, Same Output, No Side Effects](part1/input_output_side_effects.md) inside of pure functions.
 
 Our example above can be changed to pure by using Array destructuring:
 

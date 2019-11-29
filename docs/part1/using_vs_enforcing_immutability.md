@@ -23,7 +23,7 @@ const clone2 = object =>
     JSON.parse(JSON.stringify(object))
 ```
 
-This is not what Functional Programming is about. It's about using and composing pure functions, not ensuring someone cannot mutate data. If you use pure functions and compose them, you end up not mutating data, and thus there is no reason to enforce it. In the `clone1` example above, if we remove the phoneNumbers copying, yes, we'll have a reference to the "old" phoneNumbers array. Who cares? Our code only reads it and never sets nor mutates it so don't have to worry. 
+This is not what Functional Programming is about. It's about using and composing pure functions, not ensuring someone cannot mutate data. If you use pure functions and compose them, you end up not mutating data, and thus there is no reason to enforce it. In the `clone1` example above, if we remove the phoneNumbers copying, yes, we'll have a reference to the "old" phoneNumbers array. Who cares? Our code only reads it and never sets nor mutates it so don't have to worry.
 
 ... however, in the real world, you will be working with non-FP programmers, writing non-FP code, using non-FP libraries. Sometimes knowing how to suss out the mutation, prevent it, or benefit from performance techniques are helpful to support immutability. When dealing with concurrency, you may have other instances of your application mutating data, which is why languages like [Erlang](https://www.erlang.org/) ensure you physically can't mutate data to keep you safe in those concurrent environments.
 
@@ -39,11 +39,9 @@ log(name2) // Cow
 log(name1) // Jesse
 ```
 
-For Arrays and Objects, however, favor [Destructuring Assignment in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment). Python and Lua are more complicated.
+For Arrays and Objects, however, favor [Destructuring Assignment in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment). Python and Lua are more complicated. Editor: FIXME
 
 # Object.freeze
-
-Frameworks like [Redux](https://redux.js.org/) ensure there is only 1 variable in your application. You'll hear developers say it helps avoid prop drilling, or it allows sibling components in the tree to communicate, and those are both true. As an FP'er, you know it's most important feature is to support immutability. You never mutate the data yourself, instead asking the `store` to hide the access, and provide functions that allow the data to be changed internally using pure functions.
 
 If you're dealing with a legacy system, or with code not written in using pure functions, using `Object.freeze` can help probe where the mutation is occurring in a heavy handed way by triggering an exception wherever the mutation exists. Functional Programming is about returning values, not causing side effects, and throwing errors is just that: intentional side effects.
 
