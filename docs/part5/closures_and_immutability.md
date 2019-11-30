@@ -1,6 +1,33 @@
 # Closures And Immutability
 
-A closure is an function that encloses something. Every time a function is created, it creates a closure, and each has rules about what scope it can and cannot access. We're covering it here because it can help in immutability, violate it, and is the way in which we create curried functions.
+If you understand closures, you can skip this chapter. We discuss the nuances of how closures don't protect you 100% when attempting to enforce immutabile data in JavaScript.
+
+If you understand non-class scope, but want a refresher of how closures enable curried functions, skip to "Advanced Closures".
+
+Closures and scope are easiest in Lua, mostly sensible in Python, and bonkers in JavaScript. So, we'll cover JavaScript here. If you can learn JavaScript, most of the lessons below are easily transferrable to Python and Lua.
+
+A closure is an function that encloses something. Every time a function is created, it creates a closure, and each has rules about what scope it can and cannot access. We're covering it here because it can help in immutability, how one can violate it, and is the way in which we create curried functions. Understanding how closures work in dynamic languages will help you understand and debug curried functions more easily. Closures require a deep knowledge of scope, which will cover at a basic level here.
+
+## Variable Scope
+
+Variables have different types in dynamic languages, and their scoping rules are numerous and cofusing. You don't use variables, or even constants much in Functional Programming. Instead, you use pure functions that take inputs and return data and ocassionally that data is long lived Objects.
+
+In JavaScript, there are 5 basic ways to define a variable:
+1. Using `var`
+2. `let`
+3. `const`
+4. assuming it's already defined and creating it in the current scope
+5. creating one on a specific scope
+
+There are 2 types of errors the above can affect, specifically compilation errors and runtime errors. Although JavaScript is an interpretted language, it does have 2 "passes" it does, where the runtime will read the code twice. The simplified version goes like so. First it'll verify all the variables and functions are spelled correctly. Then it'll attempt to run the code.
+
+That first step is where things like missing a `var`/`let`/`const` won't even let the code run and you'll get a `SyntaxError`. These are the ones you have to memorize first. Once you memorize the rules around this, and the error messages you get if you forget, you'll only then be able to start to piece together the intricate rules of scope. Below we'll cover some of the rules and how they relate to functions.
+
+### Var
+
+While `var` is considered deprecated in JavaScript, JavaScript runs on the internet. Since you're not allowed to break the internet `var` still works and will continue to do so for a long time.
+
+`var cow = 'Sup'` does a few things
 
 ## Basic Closure
 
@@ -21,6 +48,8 @@ sayHey() // hey
 sayHey() // hey
 sayHey() // hey
 ```
+
+Notice that scope wise, the variable `message` only exists while within the function. 
 
 ## Data Privacy
 

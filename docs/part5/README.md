@@ -2,11 +2,23 @@
 
 *Warning*: This chapter makes no sense unless you understand how to compose pure functions together. If you don't know what that means, go read [Part 4: Composing Functions](../part4).
 
-Currying, or function currying, is when you make all functions take 1 argument, even those that normally need more. This means if you have a function that takes 2 arguments to do something useful, if you call it with 1 argument, it'll return a function. If you call that returned function with 1 argument, it'll then return the result. It's named after the guy who invented the technique, [Haskell Brooks Curry](https://en.wikipedia.org/wiki/Haskell_Curry). Currying functions is done so they're easier and more flexible to compose.
+Currying, or function currying, is when you make all functions take 1 argument. It's named after the guy who invented the technique, [Haskell Brooks Curry](https://en.wikipedia.org/wiki/Haskell_Curry). Currying functions is done so they're easier and more flexible to compose. Function currying was originally created to make functions easier to work in math equations. In real world functional programming, you use them to:
+
+- shorten how many arguments a function requires
+- write less code
+- create reusable functions from other functions
+- write in point free style
+- expose useful functions for developers using our code
+- make it easier to create partial applications so you can more easily compose functions
+
+Curried functions are used in 2 ways:
+
+1. you call the curried function with all the arguments, you just use parentehsis instead of commas (i.e. `getSearchURL('pizza', 'dev')`)
+2. you call the curried function with some arguments, and use the returned function elsewhere. (i.e. `getSearchURL('pizza')`)
 
 ## How You Do It
 
-Here we have a function that takes an environment such as development, staging, and production as well as a query parameter. Using both, we'll construct a URL for doing text searches.
+Here we have a function that takes an environment such as development, staging, and production as well as a query parameter. Using both, we'll construct a URL for doing text searches. This ensures the code will work across environments, typically the `environment` part coming from an environment variable like `process.env.NODE_ENV` in Node.js.
 
 ```javascript
 const getSearchURL = (query, environment) =>
@@ -58,7 +70,7 @@ console.log(searchChickenOnProdresult) // https://prod-server.com/search?query=c
 
 ## Why Are We Doing This?
 
-Currying can make composing easier by allowing to not have to wrap functions just to simplify their arguments. Let's revist the composition in the last chapter. We had 4 functions to parse some people JSON string into a list of formatted names.
+Currying can make composing easier with less code that is sometimes reusable by allowing to not have to wrap functions just to simplify their arguments. Let's revist the composition in the last chapter. We had 4 functions to parse some people JSON string into a list of formatted names.
 
 ```javascript
 const parsePeopleNames = str =>
@@ -505,10 +517,39 @@ const parsePeopleNames = str =>
         .then(map(startCase))
 ```
 
-Be aware, [Prettier](https://prettier.io/), the popular code formatter, favors more of the smooshing and doesn't really support the Lisp-like way of writing JavaScript curried functions shown above. Also, as your JavaScript starts to look more like Lisp/Closure, you may start to get lost lining up all the parenthesis. https://github.com/CoenraadS/Bracket-Pair-Colorizer-2
+Be aware, [Prettier](https://prettier.io/), the popular code formatter, favors more of the smooshing and doesn't really support the Lisp-like way of writing JavaScript curried functions shown above. Also, as your JavaScript starts to look more like Lisp/Closure, you may start to get lost lining up all the parenthesis. The [Bracket Colorizer v2](https://github.com/CoenraadS/Bracket-Pair-Colorizer-2) plugin for [VSCode](https://code.visualstudio.com/) can help. While marketed at brackets, something you'll use a lot less in Functional Programming, it helps a lot colorizing your parentheses to help you visualize what paren goes with what.
+
+## Using With The Pipeline Operator
+
+Many functional languages have pipeline syntax, and JavaScript is no exception. From the previous chapter, the [pipeline operator](https://github.com/tc39/proposal-pipeline-operator) has a proposal, and you can use via Babel. Below is the Promise, uncurried pipeline, in smooshed together format:
+
+```javascript
+const parsePeopleNames = str =>
+    JSON.parse(str)
+    |> peeps => peeps.filter(person => person.type === 'Human')
+    |> humans => humans.map(human => `${human.firstName} ${human.lastName}`)
+    |> names => names.map(startCase)
+```
+
+And here's the equivalent curried version smooshed together:
+
+```javascript
+const parsePeopleNames = str =>
+    JSON.parse(str)
+    |> filter(person => person.type === 'Human')
+    |> map(human =>`${human.firstName} ${human.lastName}`)
+    |> map(startCase)
+```
+
+I think here is where curry really shines, and shows why other functional languages have adopted this operator.
 
 ## Conclusions
 
+Curried functions are functions that take multiple arguments and only when the last argument is supplied does the function do any work. Each argument returns a funtion with that argumented stored and ready to go. You cannot have a curried function with 1 argument. The arguments are typically stored in function closures. You either call them with all arguments to get a value, or some and use the returned function later.
+
+We've shown above how you can utilize curried functions to drastically reduce how much code you need to write, and how it contributes to code re-use. If you come from a statically typed language, you can see how it's quite hard to know what the curried function is returning. This means you either have to memorize what the types of the inputs are, memorize the methods and their argument order, and/or run the code with logging to see what happens. Par for the course in dynamic languages.
+
+The techniques above are manual currying using arrow functions for their automatic return values and lightweight syntax that is easier to read than function declarations in function currying. However, as you'll see in future chapters, you do not have to manually write them. Many libraries provie helper methods that can curry existing code. In addition, they give you flexibility, allowing you to call the functions in a curried fashion, or the old fashion way, or both. This helps when you're learning, using non-FP code, or exposing libraries to non-FP developers.
 
 
 

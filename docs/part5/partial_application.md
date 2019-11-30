@@ -1,9 +1,9 @@
 # Partial Applications
 
-Partial applications are functions with some of their arguments already given. You've already seen these types of functions in the [Curry](curry.md) section, they just didn't have a name until now.
+Partial applications are functions with some of their arguments already given. You've already seen these types of functions in the [Curry](README.md) section, they just didn't have a name until now.
 
 They're useful for:
-- you don't have a choice, this is what curried functions return, lol
+- you don't have a choice, this is what curried functions without all their arguments return, lol
 - used in function composition and chaining
 - being more explicit when you want to use default parameters, yet still support pure, curried functions
 - helping in debugging
@@ -13,246 +13,120 @@ They're useful for:
 
 ## Curried Functions Make Partial Applications
 
-This is a manually curried function:
+You've seen partial applications in action in the previous 2 chapters. The `Array.filter` we made to filter Humans out of an `Array`. First you create a curried version of `array.filter`:
 
 ```javascript
-const loadWebsite = request => url =>
-    new Promise( ( success, failure ) =>
-        request.get(url, (error, response, html) =>
-            error
-            ? failure(error)
-            : success(html)
-        )
-    )
+filter = predicate => array =>
+    array.filter(predicate)
 ```
 
-The function it returns is a partial application:
+Then create a partial application from it:
 
 ```javascript
-const imAPartialApplication = loadWebsite(request)
+filterHumans = filter(peep => peep.type === 'Human')
 ```
 
-From our logs, it appears that our `imAPartialApplication` is actually just a function that takes 1 argument:
+The `filterHumans` is the partial application. It is the curried function `filter` with some of it's arguments applied. It's a function that takes an `Array`, and gives you a filtered `Array` back. We can then use it like a normal function:
 
 ```javascript
-// url =>
-//     new Promise( ( success, failure ) =>
-//         request.get(url, (error, response, html) =>
-//             error
-//             ? failure(error)
-//             : success(html)
-//         )
-//     )
+filterHumans([ { type: 'Human', name: 'Jesse' }, { type: 'Dog', name: 'Albus' }])
+// [ { type: 'Human', name: 'Jesse' }]
 ```
 
-But in actuality, it's the `loadURL` function below. While `console.log` will only show the `loadURL` portion, you and I know how closures work, and that `request` parameter value is up there, already defined, and waiting for `loadURL` to run and reference it.
+## Partial Applications Reduce Code Size
+
+We've seen in previous chapters that you can utilize Partial Applications to reduce code size. Using curried functions with some of their arguments means they return a function. Most things in function composition take functions like `Promise` chains using `.then`, or pipeline chains using the pipeline operator `|>`. Curried functions that take some of their arguments return functions, so this works quite well in function composition. Below, we leverage this feature to have the `filter` function defined inline to parse out Humans from the people `Array` the previous function parsers:
 
 ```javascript
-const loadWebsite = request => {
-    const loadURL = url => new Promise( ( success, failure ) =>
-        request.get(url, (error, response, html) =>
-            error
-            ? failure(error)
-            : success(html)
-        )
-    )
-    return loadURL
-}
-```
-    
-## Making Your Own Partial Applications
-
-You can certainly make your own without using curried functions. The cliche say hello function:
-
-```javascript
-const sayHello = name => {
-    const yo = () => `Sup ${name}!`
-    return yo
-}
-const heyJesse = sayHello('Jesse')
-heyJesse() // Sup Jesse!
+parsePeople = str =>
+    parsePeopleJSON(str)
+    .then(filter(peep => peep.type === 'Human'))
 ```
 
-You can use it build more dynamic ones, in the case of detecting if a browser supports the native `fetch` or not:
+Now you could define it elsewhere, and then use it:
 
 ```javascript
-import * as polyfill from 'cross-fetch'
+filterPeople = filter(peep => peep.type === 'Human')
 
-const loadJSON = (fetch, url) =>
-    fetch(url)
-    .then(response => response.json())
-
-const loadJSONWithFetch = url => {
-    if(browserSupportsFetch() {
-        return url => loadJSON(fetch, url)
-    }
-    return url => {
-        console.warn("Dude, use a newer browser... please, beg your IT Admin. Your boss. Anyone.")
-        return loadJSON(polyfill, url)
-    }
-}
+parsePeople = str =>
+    parsePeopleJSON(str)
+    .then(filterPeople)
 ```
 
-The `loadJSONWithFetch` will return a partial application. If a browser supports the native `fetch`, it'll return a `loadJSON` function that uses the native `fetch` and is waiting for you supply the URL. Otherwise, it returns one that uses the polyfill and logs a warning to the console output. Users won't see this, but it's therapeutic.
+However, doing it inline reduces code, and makes it easier for those reading after you what is going on. If `filterPeople` becomes more complex, sure, feel free to refactor into it's own function.
 
-# Creating Partial Applications Using partial
+## Partial Applications Promote Code Reuse
 
-Lodash and Ramda also have ways of creating these in a pure way. If we have the `loadWebsite` non-curried function:
+Partial Applications allow you to more easily re-use functions elsewhere. The programming convention of DRY: Don't Repeat Yourself was created to ensure you don't duplicate the same logic in multiple places. That way, if you find a problem in one and fix it, it'll still be broken in the other 2 places unless you remember to copy paste. Sometimes copy pasta coding isn't easy to do based on the implementation.
+
+The caveat to DRY is taking it too far. Sometimes code becomes quite unweidly because the logic is abstracted away to follow DRY, but is too hard to use in multiple places. Sometimes you're exploring ideas, and the logic may appear the same, but differs in slightly subtle ways. This colocation of the code can help as the logic is near where you're using it. Your mileage _will_ vary.
+
+In our previous chapter, we refactored `array.map` to be a curried function:
 
 ```javascript
-const loadWebsite = (request, url) =>
-    new Promise( ( success, failure ) =>
-        request.get(url, (error, response, html) =>
-            error
-            ? failure(error)
-            : success(html)
-        )
-    )
+map = mapper => array =>
+    array.map(mapper)
 ```
 
-While it's pure and allows us to easily unit test it by stubbing `request`, we want to expose it as a public function in our API with `request` baked in. That way, users can just go `loadWebsite('my url')` vs. having to import `request`.
-
-If it were curried, we could just do this:
+Then we used it in 2 places. The first was to convert people `Object`'s with their full name as a `String`:
 
 ```javascript
-// Node's CommonJS
-module.exports = {
-    loadWebsite: loadWebsite(request)
-}
-
-// ES6
-export const loadWebsiteWithRequest = loadWebsite(request)
+map(human =>`${human.firstName} ${human.lastName}`)
 ```
 
-Instead rewriting the function to be manually curried, or using of the various `curry` functions Lodash, Ramda, and other libraries have, we can instead just create a partial directly using the `partial` function from Lodash.
+The second is to correct the capitaliation of the names to ensure the first and last name have their first character uppercased:
 
 ```javascript
-// Node's CommonJS
-const { partial } = require('lodash')
-
-module.exports = {
-    loadWebsite: partial(loadWebsite, [request])
-}
-
-// ES6
-import { partial } from 'lodash'
-
-export const loadWebsiteWithRequest = partial(loadWebsite, [request])
+map(startCase)
 ```
 
-If you were to write that manually, without currying or partial applications, while impure, it'd be:
+Same `map` function, just a different predicate function. This results in 2 differnet kinds of partial applications.
+
+## Stubs vs. Mocks
+
+When unit testing pure functions with side effects, in non-functional languages, you'll often have modules/classes/functions that handle them. For pure functions, this means we have to pass in our dependencies. For unit testing, this means you can pass in stubs for those dependencies instead of their original concrete implementations.
+
+For our `JSON.parse`, it has side effects when the JSON isn't parseable and will throw an error. If we refactor our `parsePeople` function to be more pure, we can declare the JSON dependency:
 
 ```javascript
-// Node's CommonJS
-module.exports = {
-    loadWebsite: url => loadWebsite(request, url)
-}
-
-// ES6
-export const loadWebsiteWithRequest = url => loadWebsite(request, url)
+parsePeople = jsonParser => str =>
+    Promise.resolve(str)
+    .then(jsonParser)
+    .then(filter(peep => peep.type === 'Human'))
 ```
 
-This is being polite to the developers using our code.
-
-If we just did:
+Then, in your unit test, you can pass in a stub:
 
 ```javascript
-module.exports = { loadWebsite }
-```
-
-Then the developer would have to first import the `request` module to make our module work:
-
-```javascript
-const { loadWebsite } = require('./loaders')
-const request = require('request')
-
-loadWebsite(request, 'http://jessewarden.com')
-```
-
-Lame! Since we've exposed partial applications, they have to do less work, yet we've ensured we're still creating pure functions for unit testing and for others to use:
-
-```javascript
-const { loadWebsite } = require('./loaders')
-
-loadWebsite('http://jessewarden.com')
-```
-
-You'll often expose both functions, usually only for testing purposes:
-
-```javascript
-module.exports = {
-    loadWebsite,
-    loadWebsiteWithRequest: partial(loadWebsite, [request])
-}
-
-// ES6
-export const loadWebsite = ...
-export const loadWebsiteWithRequest = partial(loadWebsite, [request])
-```
-
-## Partial Application With No Arguments
-
-While `partial` is a pure way to create partial applications without using currying, it can also create partial applications that take no arguments, something you can't do with currying. You can use this technique for integration testing using the unit test runner [Mocha](https://mochajs.org/). Assuming you have 2 REST API's for `/ping` and `/get/users` running on localhost:
-
-```javascript
-const ping = partial(loadWebsite, [request, 'http://localhost:3000/ping'])
-const getUsers = partial(loadWebsite, [request, 'http://localhost:3000/get/users'])
-
-beforeEach(() => {
-    // if ping responds, we can start running integration tests,
-    // otherwise, if the server isn't up, no point in running the tests.
-    return ping()
-})
-it('when /get/users is called, it should get a list of users', () => {
-    return getUsers()
-    .then(users => {
-        expect(users[0].firstName).to.not.be.empty
-    })
+it('should find 1 human when I pass it 1 human and 1 dog', () => {
+    const jsonStub = jsonString => [{type: 'Human', name: 'Jesse'}, {type:'Dog', name:'Albus'}]
+    const result = parsePeople(jsonStub)('whatever')
+    expect(result[0].name).toBe('Jesse')
 })
 ```
 
-## Fixing Argument Order with partialRight
-
-We saw in the [Parameter Order](parameter_order.md) section that the curried function had the arguments in a non-useful order. We used a function closure to create our own partial application:
+Note, we did this stub inline. You can simply put it up top and re-use the partial application in all of your tests. The advantage here is stubs are pure functions; same input, same output. This means they're deterministic. So it's ok to define them once and use in many places.
 
 ```javascript
-const loadJSON = url => fetch =>
-    fetch(url)
-    .then(response => response.json())
+const jsonStub = jsonString => [
+    {type: 'Human', firstName: 'Jesse', lastName: 'Warden' }, 
+    {type:'Dog', name:'Albus'}
+]
 
-const loadJSONWithFetch = url => loadJSON(url)(fetch)
+it('should find 1 human when I pass it 1 human and 1 dog', () => {
+    const result = parsePeople(jsonStub)('whatever')
+    expect(result[0].name).toBe('Jesse')
+})
+it('should return formatted human names', () => {
+    const result = parsePeopleNames(jsonStub)('whatever')
+    expect(result[0]).toBe('Jesse Warden')
+})
 ```
 
-We baked in `fetch` above, all you need to supply is the `url`. While we wanted `loadJSON` to have `fetch` first, instead of changing the function, we just fix it with `loadJSONWithFetch` fixing the order of the arguments by abstracting that away from us.
+## Conclusions
 
-However, `loadJSONWithFetch` isn't pure because the `fetch` isn't declared in the arguments. We can't make it pure using `partial` because she starts putting in arguments from the left:
+Partial Applications are the functions returned from a curried function when you only supply it some of its arguments. Partial Applications are also curried funtions. If you call a Partial Application with only some of it's arguments, it'll give you a Partial Application back.
 
-```javascript
-const loadJSONWithFetch = partial(loadJSON, [... er, what do I put here, fetch])
-```
+Partial Applications and Curried Functions are similiar to the distinction between function parameters and arguments. The parameter is what you write when you write the function such as `filter = predicate => array =>` which has parameters of `predicate` and `array`. The arguments are the values you actually pass such as `filter(filterHumans)(peepsList)` where `filterHumans` and `peepsList` are the actual arguments. Partial applications and curried functions, like arguments and parameters, are often used so interchangeably if you say one or the other, people know what you mean. However, there _is_ a difference, and knowing the difference can help in learning the true language and being clear when learning more advenced concepts of programming.
 
-Thankfully, there is something called `partialRight`, which instead of preloading arguments from left to right... it'll instead start from right to left.
-
-```javascript
-const { partialRight } = require('lodash')
-
-const loadJSONWithFetch = partialRight(loadJSON, [fetch])
-```
-
-The closure version of that would look like:
-
-```javascript
-const loadJSONWithFetch = url => loadJSON(url, fetch)
-```
-
-Now you can call it with the `url` at your leisure:
-
-```javascript
-loadJSONWithFetch('http://jessewarden.com')
-.then(console.log)
-.catch(console.log)
-```
-
-The `partialRight` is pure unlike the closure which is not, and can support functions that are written with static things that are on the right (latter/last in the argument list) instead of left (first or early in the parameter list).
-
-If it's 3rd party code, or you're on a deadline, `partialRight` can be a lifesaver. If it's your code, fix the parameter order instead of using this function.
+You've seen how you can make them from curried functions, how they help reduce code size, promote code reuse, and how they can help with stubs in unit testing. 

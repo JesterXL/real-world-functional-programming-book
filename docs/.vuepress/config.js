@@ -66,14 +66,13 @@ module.exports = {
         {
           title: 'Part 5: Curry and Partial Applications',
           path: '/part5/',
-          sidebarDepth: 3,
+          sidebarDepth: 2,
           children: [
-            '/part5/curry',
             '/part5/parameter_order',
             '/part5/partial_application',
+            '/part5/styles_of_curry',
             '/part5/closures_and_immutability',
             '/part5/arity',
-            '/part5/styles_of_curry',
             '/part5/lodash_fp'
           ]
         },
